@@ -12,69 +12,71 @@ public class Gestion {
     static int totalClientes = 0;
     static int totalCuentas = 0;
     static String filtroIdCliente = "Todos";
-    static String filtroEstado = "Todos"; 
-    static String filtroTipoCuenta = "Todos"; 
-    static String filtroSaldoTipo = "Todos"; 
+    static String filtroEstado = "Todos";
+    static String filtroTipoCuenta = "Todos";
+    static String filtroSaldoTipo = "Todos";
     static double filtroSaldoValor = 0.0;
 
 //------Metodos del Menu Bancario ------------------------------------------------------------------------
     public static void gestionDatos() {
-    if (totalClientes > 0) {
-        JOptionPane.showMessageDialog(null, "Datos ingresados al sistema");
-        return;
-    }
+        if (totalClientes > 0) {
+            JOptionPane.showMessageDialog(null, "Datos ingresados al sistema");
+            return;
+        }
 
-    String[] nombres = {"Fernando", "Carlos", "Federico", "Karla", "Jimena", "Arianna", "Lucia", "Daniela", "Brenda", "Dayanna"};
-    String[] apellidos = {"Aguilar", "Avila", "Rodriguez", "Cascante", "Sequiera", "Hernandez", "Araya", "Chinchilla", "Vargas", "Guerrero"};
+        String[] nombres = {"Fernando", "Carlos", "Federico", "Karla", "Jimena", "Arianna", "Lucia", "Daniela", "Brenda", "Dayanna"};
+        String[] apellidos = {"Aguilar", "Avila", "Rodriguez", "Cascante", "Sequiera", "Hernandez", "Araya", "Chinchilla", "Vargas", "Guerrero"};
 
-    for (int i = 0; i < 10; i++) {
-        String identificaciones = "1-100" + i + "-000" + i;
-        String nombre = nombres[i] + " " + apellidos[i];
-        String telefono = "7000-000" + i;
-        String correo = "cliente" + i + "@gmail.com";
-        Cliente nuevo = new Cliente(identificaciones, nombre, telefono, correo);
-        clientes[i] = nuevo;
-        totalClientes++;
-    }
+        for (int i = 0; i < 10; i++) {
+            String identificaciones = "1-100" + i + "-000" + i;
+            String nombre = nombres[i] + " " + apellidos[i];
+            String telefono = "7000-000" + i;
+            String correo = "cliente" + i + "@gmail.com";
+            Cliente nuevo = new Cliente(identificaciones, nombre, telefono, correo);
+            clientes[i] = nuevo;
+            totalClientes++;
+        }
+        for (int i = 0; i < 12; i++) {
+            Cliente generado = clientes[i % 9]; // distribuye entre primeros 9 clientes
+            Cuenta nuevaCuenta = new Cuenta(generado, generado.getIdCliente(), TipoCuenta.Corriente, (i + 1) * 100);
+            cuentas[totalCuentas++] = nuevaCuenta;
+            generado.agregarCuenta(nuevaCuenta.getNumCuentaCliente());
+        }
+        Random random = new Random();
 
-    for (int i = 0; i < 12; i++) {
-        Cliente generado = clientes[i % 9]; // distribuye entre primeros 9 clientes
-        Cuenta nuevaCuenta = new Cuenta(generado, generado.getIdCliente(), TipoCuenta.Corriente, (i + 1) * 100);
-        cuentas[i] = nuevaCuenta;
-        totalCuentas++;
-    }
-
-    Random random = new Random();
-    for (int i = 0; i < totalCuentas; i++) {
-        Cuenta cuenta = cuentas[i];
-        int cantidadMovs = random.nextInt(0, 6); // 0 a 5 movimientos
-
-        for (int j = 0; j < cantidadMovs; j++) {
-            int tipoNum = random.nextInt(0, 2); // 0 o 1
-            String detalle;
-            TipoMovimiento tipoMovimiento;
-            if (tipoNum == 0) {
-                tipoMovimiento = TipoMovimiento.Deposito;
-                detalle = "Deposito";
-            } else {
-                tipoMovimiento = TipoMovimiento.Retiro;
-                detalle = "Retiro";
+        for (int i = 0; i < totalCuentas; i++) {
+            Cuenta cuenta = cuentas[i];
+            if (cuenta == null) {
+                continue;
             }
-            int NcuentaOrigen = cuentas[i].getNumCuentaCliente();
-            double monto = 1000 + random.nextInt(90001); // 1000 a 91000
-            String detalle1 = detalle + " $" + monto;
-            Movimientos movimiento = new Movimientos(tipoMovimiento, NcuentaOrigen, monto, detalle1);
-            cuenta.agregarMovimiento(movimiento);
-            if (detalle.equals("Deposito")) {
-                cuenta.setSaldoInicial(cuenta.getSaldoInicial() + monto);
-            } else{
-                cuenta.setSaldoInicial(cuenta.getSaldoInicial() - monto);
+
+            int cantidadMovs = random.nextInt(0, 6); // de 0 a 5 movimientos
+
+            for (int j = 0; j < cantidadMovs; j++) {
+                TipoMovimiento tipoMovimiento;
+                String detalle;
+                double monto = 1000 + random.nextInt(0, 90001); // 1000 a 91000
+                int NcuentaOrigen = cuenta.getNumCuentaCliente();
+
+                // Elegir aleatoriamente, pero evitando saldo negativo
+                if (random.nextBoolean() || cuenta.getSaldoInicial() - monto < 0) {
+                    tipoMovimiento = TipoMovimiento.Deposito;
+                    detalle = "Deposito $" + monto;
+                    cuenta.setSaldoInicial(cuenta.getSaldoInicial() + monto);
+                } else {
+                    tipoMovimiento = TipoMovimiento.Retiro;
+                    detalle = "Retiro $" + monto;
+                    cuenta.setSaldoInicial(cuenta.getSaldoInicial() - monto);
+                }
+
+                Movimientos movimiento = new Movimientos(tipoMovimiento, NcuentaOrigen, monto, detalle);
+                movimiento.setNcuentaOrigen(NcuentaOrigen); // para que quede registrado
+                cuenta.agregarMovimiento(movimiento);
             }
         }
-    }
 
-    JOptionPane.showMessageDialog(null, "Datos generados con éxito");
-}
+        JOptionPane.showMessageDialog(null, "Datos generados con éxito");
+    }
 
     public static void agregarCliente() {
         String idCliente = validoID();
@@ -144,7 +146,7 @@ public class Gestion {
                                 }
                             }
                         } while (true);
-                        
+
                         Cuenta nueva = new Cuenta(clientes[i], clientes[i].getIdCliente(), tipo, saldoInicial);
                         cuentas[totalCuentas++] = nueva;
                         clientes[i].agregarCuenta(nueva.getNumCuentaCliente());
@@ -326,10 +328,10 @@ public class Gestion {
                             if (cuentas[i].getTotalmovimientos() > 0) {
                                 System.out.println(cuentas[i].mostrarHistorial());
                                 JOptionPane.showMessageDialog(null, "Movimientos en consola");
-                            } else{
+                            } else {
                                 JOptionPane.showMessageDialog(null, "La Cuenta no tiene movimientos");
                             }
-                            
+
                             break;
                         case 1:
                             JOptionPane.showMessageDialog(null, "Volviendo al menu");
@@ -356,7 +358,7 @@ public class Gestion {
         } while (condicion);
 
     }
-    
+
     public static void generarReportesMenu() {
         boolean salir = false;
         while (!salir) {
@@ -372,8 +374,8 @@ public class Gestion {
             String opciones[] = {"Filtros del Cliente", "Filtros de la Cuenta", "Reporte", "Salir"};
             int opcion = JOptionPane.showOptionDialog(
                     null,
-                    "Filtros del Cliente:\nID: " + filtroIdCliente + "\nEstado: " + filtroEstado +
-                    "\n\nFiltros de la Cuenta:\nTipo: " + filtroTipoCuenta + "\nSaldo: " + textoSaldo,
+                    "Filtros del Cliente:\nID: " + filtroIdCliente + "\nEstado: " + filtroEstado
+                    + "\n\nFiltros de la Cuenta:\nTipo: " + filtroTipoCuenta + "\nSaldo: " + textoSaldo,
                     "Generar Reportes",
                     JOptionPane.DEFAULT_OPTION,
                     JOptionPane.INFORMATION_MESSAGE,
@@ -401,29 +403,65 @@ public class Gestion {
             }
         }
     }
-    
+
     private static void generarReporte() {
         System.out.println("===== REPORTE DE CUENTAS =====");
+        boolean hayResultados = false;
 
-        boolean hayResultados = true;
+        for (int i = 0; i < totalClientes; i++) {
+            Cliente cliente = clientes[i];
+            if (cliente == null) {
+                continue;
+            }
 
-        for (int i = 0; i < totalCuentas; i++) {
-            Cliente cliente = buscarClientePorId(filtroIdCliente);
+            // --- FILTRO ID CLIENTE ---
+            if (!"Todos".equalsIgnoreCase(filtroIdCliente)
+                    && !cliente.getIdCliente().equalsIgnoreCase(filtroIdCliente)) {
+                continue;
+            }
+
+            // --- FILTRO ESTADO ---
+            if (!"Todos".equalsIgnoreCase(filtroEstado)
+                    && !cliente.getEstadoCliente().name().equalsIgnoreCase(filtroEstado)) {
+                continue;
+            }
+
+            // Recorremos todas las cuentas del cliente
             for (int j = 0; j < cliente.getCantidadCuentas(); j++) {
-                int numCuenta = cliente.obtenerNumCuenta(j);
-                Cuenta cuenta = buscarCuentaPorNcuenta(numCuenta);
-                boolean pasaFiltros = pasaFiltros(cliente, cuenta);
-                if (pasaFiltros) {
-                    System.out.println("[Id cliente]: " + cliente.getIdCliente()
-                            + " [Estado]: " + cliente.getEstadoCliente()
-                            + " [Número de cuenta]: " + cuenta.getNumCuentaCliente()
-                            + " [Tipo de cuenta]: " + cuenta.getTipoCuenta()
-                            + " [Saldo]: $" + cuenta.getSaldoInicial());
-                    hayResultados = false;
+                Cuenta cuenta = buscarCuentaPorNcuenta(cliente.getNumerosCuentas()[j]);
+                if (cuenta == null) {
+                    continue;
                 }
+
+                // --- FILTRO TIPO CUENTA ---
+                if (!"Todos".equalsIgnoreCase(filtroTipoCuenta)
+                        && !cuenta.getTipoCuenta().name().equalsIgnoreCase(filtroTipoCuenta)) {
+                    continue;
+                }
+
+                // --- FILTRO SALDO ---
+                if (!"Todos".equalsIgnoreCase(filtroSaldoTipo)) {
+                    if ("Mayor".equalsIgnoreCase(filtroSaldoTipo)
+                            && !(cuenta.getSaldoInicial() > filtroSaldoValor)) {
+                        continue;
+                    }
+                    if ("Menor".equalsIgnoreCase(filtroSaldoTipo)
+                            && !(cuenta.getSaldoInicial() < filtroSaldoValor)) {
+                        continue;
+                    }
+                }
+
+                // Si pasa todos los filtros → mostrar
+                System.out.println("[Id cliente]: " + cliente.getIdCliente()
+                        + " [Estado]: " + cliente.getEstadoCliente()
+                        + " [Número de cuenta]: " + cuenta.getNumCuentaCliente()
+                        + " [Tipo de cuenta]: " + cuenta.getTipoCuenta()
+                        + " [Saldo]: $" + cuenta.getSaldoInicial());
+                hayResultados = true;
             }
         }
-        if (hayResultados) {
+
+        if (!hayResultados) {
             System.out.println("No se encontraron resultados con los filtros aplicados.");
         }
         System.out.println("==============================\n");
@@ -868,7 +906,7 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-    
+
     public static Cuenta buscarCuentaPorIdCliente(Cliente cliente) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cliente.getIdCliente().equals(cuentas[i].getIdCliente())) {
@@ -877,8 +915,8 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-    
-    public static Cuenta buscarCuentaDeClientePorTipoCuenta(Cliente  cliente, String tipoCuenta) {
+
+    public static Cuenta buscarCuentaDeClientePorTipoCuenta(Cliente cliente, String tipoCuenta) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cliente.getIdCliente().equals(cuentas[i].getIdCliente()) && cuentas[i].getTipoCuenta().toString().equals(tipoCuenta)) {
                 return cuentas[i];
@@ -954,7 +992,7 @@ public class Gestion {
         }
         return correo;
     }
-    
+
     private static String solicitarIdCliente() {
         String id = JOptionPane.showInputDialog("Ingrese el ID del cliente (o dejar vacío para Todos):");
         if (id == null || id.trim().equals("")) {
@@ -1033,7 +1071,7 @@ public class Gestion {
                 "Filtro Saldo", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[0]);
         return opciones[opcion];
     }
-    
+
     private static boolean pasaFiltros(Cliente cliente, Cuenta cuenta) {
         // Filtro ID cliente
         if (!filtroIdCliente.equals("Todos") && !cliente.getIdCliente().equals(filtroIdCliente)) {
@@ -1043,7 +1081,7 @@ public class Gestion {
         EstadoCliente estadoCliente;
         if (filtroEstado.equals("Activo")) {
             estadoCliente = EstadoCliente.Activo;
-        } else{
+        } else {
             estadoCliente = EstadoCliente.Inactivo;
         }
         if (!filtroEstado.equals("Todos") && !cliente.getEstadoCliente().equals(estadoCliente)) {
@@ -1057,7 +1095,7 @@ public class Gestion {
             tipoCuenta = TipoCuenta.Ahorros;
         } else if (filtroTipoCuenta.equals("Inversion")) {
             tipoCuenta = TipoCuenta.Inversion;
-        } else{
+        } else {
             tipoCuenta = TipoCuenta.Planilla;
         }
         if (!filtroTipoCuenta.equals("Todos") && !cuenta.getTipoCuenta().equals(tipoCuenta)) {

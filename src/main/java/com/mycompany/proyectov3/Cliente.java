@@ -57,7 +57,7 @@ public class Cliente {
     }
     
     public void agregarCuenta(int numeroCuenta) {
-        if (cantidadCuentas < 5) {
+        if (cantidadCuentas < numerosCuentas.length) {
             numerosCuentas[cantidadCuentas++] = numeroCuenta;
         }
     }
