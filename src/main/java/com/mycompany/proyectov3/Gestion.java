@@ -1,7 +1,6 @@
 package com.mycompany.proyectov3;
 
 import static com.mycompany.proyectov3.ProyectoV3.HiperBanco;
-import java.time.LocalDate;
 import java.util.Random;
 import javax.swing.JOptionPane;
 
