@@ -1,6 +1,5 @@
 package com.mycompany.proyectov3;
 
-import static com.mycompany.proyectov3.ProyectoV3.HiperBanco;
 import java.util.Random;
 import javax.swing.JOptionPane;
 
@@ -94,82 +93,83 @@ public class Gestion {
     }
 
     public static void agregarCuenta() {
-        boolean condicionDO = true;
-        do {
-            String idCliente = JOptionPane.showInputDialog("Ingrese su ID en formato 0-0000-0000: ");
-            boolean clienteEncontrado = false;
-            for (int i = 0; i < totalClientes; i++) {
-                if (idCliente.equals(clientes[i].getIdCliente())) {
-                    clienteEncontrado = true;
-                    if (clienteEncontrado) {
-                        JOptionPane.showMessageDialog(null, "El usuario tiene " + clientes[i].getCantidadCuentas() + " cuentas puede crear otra");
-                        if (clientes[i].getCantidadCuentas() >= 5) {
-                            JOptionPane.showMessageDialog(null, "El cliente ya tiene 5 cuentas.");
-                            return; // o mostrar menú con botones como lo exige el proyecto
-                        }
-                        TipoCuenta tipo;
-                        String tipoCuentaBTN[] = {"Corriente", "Ahorros", "Inversión", "Planilla"};
-                        int valorBTN = JOptionPane.showOptionDialog(null, "Indique el tipo de cuenta", "Tipo de cuenta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
-                                null, tipoCuentaBTN, "Corriente");
-                        switch (valorBTN) {
-                            case 0:
-                                tipo = TipoCuenta.Corriente;
-                                condicionDO = false;
-                                break;
-                            case 1:
-                                tipo = TipoCuenta.Ahorros;
-                                condicionDO = false;
-                                break;
-                            case 2:
-                                tipo = TipoCuenta.Inversion;
-                                condicionDO = false;
-                                break;
-                            case 3:
-                                tipo = TipoCuenta.Planilla;
-                                condicionDO = false;
-                                break;
-                            default:
-                                tipo = TipoCuenta.Ahorros;
-                        }
-                        double saldoInicial = 0;
-                        do {
-                            double saldoIngresado = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el monto inicial de la cuenta nueva:"));
-                            if (saldoIngresado >= 0) {
-                                saldoInicial = saldoIngresado;
-                                break;
-                            } else {
-                                String opcionesBTNSaldo[] = {"Ingresar otro Saldo", "Cancelar"};
-                                int valorBTN2 = JOptionPane.showOptionDialog(null, "El saldo debe ser mayor o igual a cero", " ", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, opcionesBTNSaldo, "Ingresar otro Saldo");
-                                if (valorBTN2 == 1) {
-                                    return;
-                                }
-                            }
-                        } while (true);
+        String idCliente = JOptionPane.showInputDialog("Ingrese su ID en formato 0-0000-0000: ");
+        Cliente clienteEncontrado = null;
 
-                        Cuenta nueva = new Cuenta(clientes[i], clientes[i].getIdCliente(), tipo, saldoInicial);
-                        cuentas[totalCuentas++] = nueva;
-                        clientes[i].agregarCuenta(nueva.getNumCuentaCliente());
-                        JOptionPane.showMessageDialog(null, "Cuenta agregada con exito");
-                        condicionDO = false;
-                    }
+        // Buscar cliente
+        for (int i = 0; i < totalClientes; i++) {
+            if (clientes[i] != null && idCliente.equals(clientes[i].getIdCliente())) {
+                clienteEncontrado = clientes[i];
+                break;
+            }
+        }
+
+        // Si no existe
+        if (clienteEncontrado == null) {
+            String opcionesBTN[] = {"Agregar otro ID", "Cancelar"};
+            int valorBTN = JOptionPane.showOptionDialog(null, "Cliente no encontrado", " ",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, opcionesBTN, opcionesBTN[0]);
+            if (valorBTN == 0) {
+                agregarCuenta();
+            } else {
+                JOptionPane.showMessageDialog(null, "Volviendo al menú");
+            }
+            return;
+        }
+
+        // Mostrar cuántas cuentas tiene
+        JOptionPane.showMessageDialog(null, "El usuario tiene " + clienteEncontrado.getCantidadCuentas() + " cuentas.");
+
+        if (clienteEncontrado.getCantidadCuentas() >= 5) {
+            JOptionPane.showMessageDialog(null, "El cliente ya tiene 5 cuentas.");
+            return;
+        }
+
+        // Seleccionar tipo de cuenta
+        TipoCuenta tipo = null;
+        String tipoCuentaBTN[] = {"Corriente", "Ahorros", "Inversion", "Planilla"};
+        int valorBTN = JOptionPane.showOptionDialog(null, "Indique el tipo de cuenta", "Tipo de cuenta",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, tipoCuentaBTN, tipoCuentaBTN[0]);
+
+        switch (valorBTN) {
+            case 0:
+                tipo = TipoCuenta.Corriente;
+                break;
+            case 1:
+                tipo = TipoCuenta.Ahorros;
+                break;
+            case 2:
+                tipo = TipoCuenta.Inversion;
+                break; // 
+            case 3:
+                tipo = TipoCuenta.Planilla;
+                break;
+            default:
+                tipo = TipoCuenta.Ahorros;
+        }
+
+        double saldoInicial = 0;
+        String saldoIngresadoStr = JOptionPane.showInputDialog("Ingrese el monto inicial de la cuenta nueva:");
+        if (saldoIngresadoStr != null && !saldoIngresadoStr.trim().equals("")) {
+            boolean esNumero = true;
+            for (int i = 0; i < saldoIngresadoStr.length(); i++) {
+                char c = saldoIngresadoStr.charAt(i);
+                if (c < '0' || c > '9') {
+                    esNumero = false;
+                    break;
                 }
             }
-            if (!clienteEncontrado) {
-                String opcionesBTN[] = {"Agregar otro ID", "Cancelar"};
-                int valorBTN = JOptionPane.showOptionDialog(null, "Cliente no entrado", " ", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, opcionesBTN, "Agregar otro ID");
-                switch (valorBTN) {
-                    case 0:
-                        agregarCuenta();
-                        break;
-                    case 1:
-                        JOptionPane.showMessageDialog(null, "Volviendo al menu");
-                        condicionDO = false;
-                    default:
-
-                }
+            if (esNumero) {
+                saldoInicial = Double.parseDouble(saldoIngresadoStr);
             }
+        }
 
-        } while (condicionDO);
+        // Crear la cuenta y asignarla al cliente
+        Cuenta nueva = new Cuenta(clienteEncontrado, clienteEncontrado.getIdCliente(), tipo, saldoInicial);
+        cuentas[totalCuentas++] = nueva;
+        clienteEncontrado.agregarCuenta(nueva.getNumCuentaCliente());
+
+        JOptionPane.showMessageDialog(null, "Cuenta agregada con éxito.");
     }
 
     public static void mostrarClientes() {
@@ -412,17 +412,18 @@ public class Gestion {
             if (cliente == null) {
                 continue;
             }
-
             // --- FILTRO ID CLIENTE ---
             if (!"Todos".equalsIgnoreCase(filtroIdCliente)
                     && !cliente.getIdCliente().equalsIgnoreCase(filtroIdCliente)) {
                 continue;
             }
-
             // --- FILTRO ESTADO ---
-            if (!"Todos".equalsIgnoreCase(filtroEstado)
-                    && !cliente.getEstadoCliente().name().equalsIgnoreCase(filtroEstado)) {
-                continue;
+            if (!"Todos".equalsIgnoreCase(filtroEstado)) {
+                EstadoCliente estadoEnum = cliente.getEstadoCliente();
+                if ((estadoEnum == EstadoCliente.Activo && !"Activo".equalsIgnoreCase(filtroEstado))
+                        || (estadoEnum == EstadoCliente.Inactivo && !"Inactivo".equalsIgnoreCase(filtroEstado))) {
+                    continue;
+                }
             }
 
             // Recorremos todas las cuentas del cliente
@@ -431,13 +432,16 @@ public class Gestion {
                 if (cuenta == null) {
                     continue;
                 }
-
                 // --- FILTRO TIPO CUENTA ---
-                if (!"Todos".equalsIgnoreCase(filtroTipoCuenta)
-                        && !cuenta.getTipoCuenta().name().equalsIgnoreCase(filtroTipoCuenta)) {
-                    continue;
+                if (!"Todos".equalsIgnoreCase(filtroTipoCuenta)) {
+                    TipoCuenta tipoEnum = cuenta.getTipoCuenta();
+                    if ((tipoEnum == TipoCuenta.Corriente && !"Corriente".equalsIgnoreCase(filtroTipoCuenta))
+                            || (tipoEnum == TipoCuenta.Ahorros && !"Ahorros".equalsIgnoreCase(filtroTipoCuenta))
+                            || (tipoEnum == TipoCuenta.Inversion && !"Inversion".equalsIgnoreCase(filtroTipoCuenta))
+                            || (tipoEnum == TipoCuenta.Planilla && !"Planilla".equalsIgnoreCase(filtroTipoCuenta))) {
+                        continue;
+                    }
                 }
-
                 // --- FILTRO SALDO ---
                 if (!"Todos".equalsIgnoreCase(filtroSaldoTipo)) {
                     if ("Mayor".equalsIgnoreCase(filtroSaldoTipo)
@@ -449,13 +453,7 @@ public class Gestion {
                         continue;
                     }
                 }
-
-                // Si pasa todos los filtros → mostrar
-                System.out.println("[Id cliente]: " + cliente.getIdCliente()
-                        + " [Estado]: " + cliente.getEstadoCliente()
-                        + " [Número de cuenta]: " + cuenta.getNumCuentaCliente()
-                        + " [Tipo de cuenta]: " + cuenta.getTipoCuenta()
-                        + " [Saldo]: $" + cuenta.getSaldoInicial());
+                System.out.println(cuenta.obtenerDatos(false) + ", Estado Cliente: " + cliente.getEstadoCliente());
                 hayResultados = true;
             }
         }
@@ -465,8 +463,8 @@ public class Gestion {
         }
         System.out.println("==============================\n");
     }
+    //------Metodos del Menu Cliente ------------------------------------------------------------------------
 
-//------Metodos del Menu Cliente ------------------------------------------------------------------------
     public static void InicioCliente() {
         if (totalClientes == 0) {
             JOptionPane.showMessageDialog(null, "No hay clientes registrados en el sistema.");
@@ -512,53 +510,58 @@ public class Gestion {
 
     public static void MenuClientes(Cliente cliente) {
         int opcionMenu;
-        String bienvenidaCliente = "Bienvenido " + cliente.getNombreCliente();
-        String btnMenuCliente[] = {"REALIZAR TRANSACCIONES", "MIS CUENTAS", "ACTUALIZAR", "SALIR"};
-        opcionMenu = JOptionPane.showOptionDialog(null, "Bienvenido al sistema" + bienvenidaCliente + " seleccione la opcion a realizar", "Hiper Banco",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, btnMenuCliente, "SALIR");
-        switch (opcionMenu) {
-            case 0:
-                RealizarTransacciones(cliente);
-                break;
-            case 1:
-                misCuentas(cliente);
-                break;
-            case 2:
-                Actualizar(cliente);
-                break;
-            case 3:
-                JOptionPane.showMessageDialog(null, "Saliendo..");
-                HiperBanco();
-                break;
-            default:
-                JOptionPane.showMessageDialog(null, "Opcion invalida");
-                HiperBanco();
-        }
+        do {
+            String bienvenidaCliente = "Bienvenido " + cliente.getNombreCliente();
+            String btnMenuCliente[] = {"REALIZAR TRANSACCIONES", "MIS CUENTAS", "ACTUALIZAR", "SALIR"};
+            opcionMenu = JOptionPane.showOptionDialog(null, "Bienvenido al sistema" + bienvenidaCliente + " seleccione la opcion a realizar", "Hiper Banco",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, btnMenuCliente, "SALIR");
+            switch (opcionMenu) {
+                case 0:
+                    RealizarTransacciones(cliente);
+                    break;
+                case 1:
+                    misCuentas(cliente);
+                    break;
+                case 2:
+                    Actualizar(cliente);
+                    break;
+                case 3:
+                    JOptionPane.showMessageDialog(null, "Saliendo..");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "La opción " + opcionMenu + " ingresada no valida, intente de nuevo.");
+            }
+        } while (opcionMenu != 3);
+
     }
 
     public static void RealizarTransacciones(Cliente cliente) {
         int opcionMenuTransaccion;
-        String btnMenuTransacciones[] = {"DEPOSITO", "RETIRO", "TRANSFERENCIA", "COMPRA", "CANCELAR"};
-        opcionMenuTransaccion = JOptionPane.showOptionDialog(null, "Bienvenido al sistema", "Hiper Banco",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, btnMenuTransacciones, "SALIR");
-        switch (opcionMenuTransaccion) {
-            case 0:
-                RealizarDeposito(cliente);
-                break;
-            case 1:
-                RealizarRetiro(cliente);
-                break;
-            case 2:
-                RealizarTranferencias(cliente);
-                break;
-            case 3:
-                RealizarCompra(cliente);
-                break;
-            case 4:
-                JOptionPane.showMessageDialog(null, "Saliendo..");
-                MenuClientes(cliente);
-                break;
-        }
+        do {
+            String btnMenuTransacciones[] = {"DEPOSITO", "RETIRO", "TRANSFERENCIA", "COMPRA", "CANCELAR"};
+            opcionMenuTransaccion = JOptionPane.showOptionDialog(null, "Bienvenido al sistema", "Hiper Banco",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, btnMenuTransacciones, "SALIR");
+            switch (opcionMenuTransaccion) {
+                case 0:
+                    RealizarDeposito(cliente);
+                    break;
+                case 1:
+                    RealizarRetiro(cliente);
+                    break;
+                case 2:
+                    RealizarTranferencias(cliente);
+                    break;
+                case 3:
+                    RealizarCompra(cliente);
+                    break;
+                case 4:
+                    JOptionPane.showMessageDialog(null, "Saliendo..");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "La opción " + opcionMenuTransaccion + " ingresada no valida, intente de nuevo.");
+            }
+        } while (opcionMenuTransaccion != 4);
+
     }
 
     public static void RealizarDeposito(Cliente cliente) {
