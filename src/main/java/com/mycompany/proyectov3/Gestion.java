@@ -453,7 +453,11 @@ public class Gestion {
                         continue;
                     }
                 }
-                System.out.println(cuenta.obtenerDatos(false) + ", Estado Cliente: " + cliente.getEstadoCliente());
+                System.out.println("[Id cliente]: " + cliente.getIdCliente()
+                            + " [Estado]: " + cliente.getEstadoCliente()
+                            + " [Número de cuenta]: " + cuenta.getNumCuentaCliente()
+                            + " [Tipo de cuenta]: " + cuenta.getTipoCuenta()
+                            + " [Saldo]: $" + cuenta.getSaldoInicial());
                 hayResultados = true;
             }
         }
