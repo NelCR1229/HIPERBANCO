@@ -2,13 +2,19 @@ package com.mycompany.proyectov3;
 
 import java.util.Random;
 import javax.swing.JOptionPane;
-
+/**
+ * genera datos y movimientos aleatorios,busca clientes y cuentas,
+ * autentificacion de  clietne por usuario/ clave y tarjeta de acceso
+ * reportes por consola con filtros y posee menus
+ * 
+ */
 public class Gestion {
 
-    static Cuenta cuentas[] = new Cuenta[150];
-    static Cliente clientes[] = new Cliente[30];
+    static Cuenta cuentas[] = new Cuenta[150];//cuentas capacidad de 150
+    static Cliente clientes[] = new Cliente[30];//cleintes capacidad de 30
     static int totalClientes = 0;
     static int totalCuentas = 0;
+    //filtros para reportes con valores por defecto
     static String filtroIdCliente = "Todos";
     static String filtroEstado = "Todos";
     static String filtroTipoCuenta = "Todos";
@@ -16,6 +22,8 @@ public class Gestion {
     static double filtroSaldoValor = 0.0;
 
 //------Metodos del Menu Bancario ------------------------------------------------------------------------
+    //genera datos iniciales de 10 clientes, en 12 cuentras con 0-5 
+    //movimientos, no duplica clientes
     public static void gestionDatos() {
         if (totalClientes > 0) {
             JOptionPane.showMessageDialog(null, "Datos ingresados al sistema");
@@ -24,7 +32,7 @@ public class Gestion {
 
         String[] nombres = {"Fernando", "Carlos", "Federico", "Karla", "Jimena", "Arianna", "Lucia", "Daniela", "Brenda", "Dayanna"};
         String[] apellidos = {"Aguilar", "Avila", "Rodriguez", "Cascante", "Sequiera", "Hernandez", "Araya", "Chinchilla", "Vargas", "Guerrero"};
-
+        //crea 10 clientes
         for (int i = 0; i < 10; i++) {
             String identificaciones = "1-100" + i + "-000" + i;
             String nombre = nombres[i] + " " + apellidos[i];
@@ -34,12 +42,14 @@ public class Gestion {
             clientes[i] = nuevo;
             totalClientes++;
         }
+        //crea 12 cuents repartidads entre los primeros 9 clientes
         for (int i = 0; i < 12; i++) {
             Cliente generado = clientes[i % 9]; // distribuye entre primeros 9 clientes
             Cuenta nuevaCuenta = new Cuenta(generado, generado.getIdCliente(), TipoCuenta.Corriente, (i + 1) * 100);
             cuentas[totalCuentas++] = nuevaCuenta;
             generado.agregarCuenta(nuevaCuenta.getNumCuentaCliente());
         }
+        //genera movimientos aleatorios
         Random random = new Random();
 
         for (int i = 0; i < totalCuentas; i++) {
@@ -75,7 +85,8 @@ public class Gestion {
 
         JOptionPane.showMessageDialog(null, "Datos generados con éxito");
     }
-
+    //agrega un nuevo cliente solicitando los datos
+    //valida que el id no exista y el formato del correo
     public static void agregarCliente() {
         String idCliente = validoID();
         String nombreCliente = JOptionPane.showInputDialog("Ingresar nombre completo del cliente:");
@@ -91,6 +102,8 @@ public class Gestion {
         clientes[totalClientes++] = nuevo;
         JOptionPane.showMessageDialog(null, "Cliente agregado con exito");
     }
+    //crea una cuenta para un cliente existenta(max 5 por cliente)
+    //permite seleccionar el tipo de cuenta y saldo inicial
 
     public static void agregarCuenta() {
         String idCliente = JOptionPane.showInputDialog("Ingrese su ID en formato 0-0000-0000: ");
@@ -171,7 +184,7 @@ public class Gestion {
 
         JOptionPane.showMessageDialog(null, "Cuenta agregada con éxito.");
     }
-
+    // imprime la lista de clientes marca vacio donde no hay
     public static void mostrarClientes() {
         if (totalClientes == 0) {
             JOptionPane.showMessageDialog(null, "No hay clientes registrados en el sistema.");
@@ -190,7 +203,7 @@ public class Gestion {
 
         }
     }
-
+    //imrprime la lista de cuentas y el historial de movimientos
     public static void mostrarCuentas() {
         if (totalCuentas == 0) {
             JOptionPane.showMessageDialog(null, "No hay cuentas registrados en el sistema.");
@@ -214,7 +227,7 @@ public class Gestion {
 
         }
     }
-
+    //busca un cliente por el id, permite actualizarlo/desactivarlo o ver cuentas
     public static void buscarCliente() {
         if (totalClientes == 0) {
             JOptionPane.showMessageDialog(null, "No hay clientes registrados en el sistema.");
@@ -307,7 +320,7 @@ public class Gestion {
             }
         } while (condicion);
     }
-
+    //busca un cuenta por numero y permite consultar sus movimientos 
     public static void buscarCuenta() {
         if (totalCuentas == 0) {
             JOptionPane.showMessageDialog(null, "No hay cuentas registrados en el sistema.");
@@ -357,7 +370,7 @@ public class Gestion {
         } while (condicion);
 
     }
-
+    //muestra un menuú para configurar filtros y generar el reporte
     public static void generarReportesMenu() {
         boolean salir = false;
         while (!salir) {
@@ -402,7 +415,7 @@ public class Gestion {
             }
         }
     }
-
+    //genera con consola el reporte de cuentras aplicando toos los filtros
     private static void generarReporte() {
         System.out.println("===== REPORTE DE CUENTAS =====");
         boolean hayResultados = false;
@@ -468,7 +481,7 @@ public class Gestion {
         System.out.println("==============================\n");
     }
     //------Metodos del Menu Cliente ------------------------------------------------------------------------
-
+    //inicia el login del cliente , si no tiene una clave le solicita crear una
     public static void InicioCliente() {
         if (totalClientes == 0) {
             JOptionPane.showMessageDialog(null, "No hay clientes registrados en el sistema.");
@@ -511,7 +524,7 @@ public class Gestion {
             }
         }
     }
-
+    // menu principal para clientees, transaccions, mis cuentas, actualizar
     public static void MenuClientes(Cliente cliente) {
         int opcionMenu;
         do {
@@ -538,7 +551,7 @@ public class Gestion {
         } while (opcionMenu != 3);
 
     }
-
+    //submenu de transacciones, desposito, retiro , transferencia, compra
     public static void RealizarTransacciones(Cliente cliente) {
         int opcionMenuTransaccion;
         do {
@@ -567,7 +580,7 @@ public class Gestion {
         } while (opcionMenuTransaccion != 4);
 
     }
-
+    //realiza un depositido en una cuenta ya existente
     public static void RealizarDeposito(Cliente cliente) {
         int cuentaDeposito = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de la cuenta a depositar"));
         Cuenta cuenta = buscarCuentaPorNcuenta(cuentaDeposito);
@@ -593,7 +606,7 @@ public class Gestion {
             }
         }
     }
-
+    //realiza un retiro si el saldo es suficiente 
     public static void RealizarRetiro(Cliente cliente) {
         int cuentaRetiro = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de la cuenta a retirar"));
         Cuenta cuenta = buscarCuentaPorNcuentaOrigen(cuentaRetiro, cliente);
@@ -632,7 +645,7 @@ public class Gestion {
             }
         }
     }
-
+    //realiza una transferencia entre cuentas si hay salgo suficiente 
     public static void RealizarTranferencias(Cliente cliente) {
         int cuentaO = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de la cuenta Origen"));
         Cuenta cuentaOrigen = buscarCuentaPorNcuentaOrigen(cuentaO, cliente);;
@@ -688,7 +701,7 @@ public class Gestion {
             }
         }
     }
-
+    //registra una compra en una cuenta del cliente si el saldo alcanza
     public static void RealizarCompra(Cliente cliente) {
         int cuentaCompra = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de la cuenta a pagar."));
         Cuenta cuenta = buscarCuentaPorNcuentaOrigen(cuentaCompra, cliente);
@@ -727,7 +740,7 @@ public class Gestion {
             }
         }
     }
-
+    //muestra las cuentas y moviminetos del cliente autrnticado 
     public static void misCuentas(Cliente cliente) {
         if (totalCuentas == 0) {
             JOptionPane.showMessageDialog(null, "No hay cuentas registrados en el sistema.");
@@ -752,7 +765,7 @@ public class Gestion {
         }
         JOptionPane.showMessageDialog(null, "Cuentas mostradas");
     }
-
+    //permite actualizar nombre, telefono, correo o clave
     public static void Actualizar(Cliente cliente) {
         String idCliente = cliente.getIdCliente();
         for (int i = 0; i < totalClientes; i++) {
@@ -794,7 +807,8 @@ public class Gestion {
         }
     }
 //------ Metodos de ayuda xd------------------------------------------------------------------------
-
+    //solicita y valida que la clave cumpla con 6-10 carateres
+    //si es correcta se asigna al cliente
     public static void validarClaveCliente(Cliente cliente) {
         do {
             boolean cantidadCaracteres = false;
@@ -849,11 +863,12 @@ public class Gestion {
             }
         } while (true);
     }
-
+//valida la tarjeta de acceso de cliente solicitando 3 coordenadas aleatorias
     public static boolean validarTarjetaAcceso(Cliente cliente) {
         Random random = new Random();
         String columnas[] = {"A", "B", "C", "D", "E"};
         // Encabezado
+        //mostrar tarjeta de referncia 
         cliente.mostrarT_Acceso();
         String accesos[] = new String[3];
         int valorAccesos[] = new int[3];
@@ -875,7 +890,7 @@ public class Gestion {
             return false;
         }
     }
-
+//muestra las cuentas de un cliente segun su id
     public static void cuentasClientes() {
         String id = JOptionPane.showInputDialog("Ingrese el ID del usuario");
         Cliente clien = buscarClientePorId(id);
@@ -885,7 +900,7 @@ public class Gestion {
             }
         }
     }
-
+//busca un cliente por su id
     public static Cliente buscarClientePorId(String idBuscado) {
         for (int i = 0; i < totalClientes; i++) {
             if (clientes[i].getIdCliente().equals(idBuscado)) {
@@ -894,7 +909,7 @@ public class Gestion {
         }
         return null; // Cliente no encontrado
     }
-
+//busca una cuenta por numero 
     public static Cuenta buscarCuentaPorNcuenta(int cuenta) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cuentas[i].getNumCuentaCliente() == cuenta) {
@@ -903,7 +918,7 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-
+//busca una cuenta por numero que pertenece al clinete indicado
     public static Cuenta buscarCuentaPorNcuentaOrigen(int cuenta, Cliente cliente) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cliente.getIdCliente().equals(cuentas[i].getIdCliente()) && cuentas[i].getNumCuentaCliente() == cuenta) {
@@ -912,7 +927,7 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-
+//devuelve la primera cuenta asociaad al cliente  si existe
     public static Cuenta buscarCuentaPorIdCliente(Cliente cliente) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cliente.getIdCliente().equals(cuentas[i].getIdCliente())) {
@@ -921,7 +936,7 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-
+//busca cuenta del cliente por tipo de cuneta 
     public static Cuenta buscarCuentaDeClientePorTipoCuenta(Cliente cliente, String tipoCuenta) {
         for (int i = 0; i < totalCuentas; i++) {
             if (cliente.getIdCliente().equals(cuentas[i].getIdCliente()) && cuentas[i].getTipoCuenta().toString().equals(tipoCuenta)) {
@@ -930,7 +945,7 @@ public class Gestion {
         }
         return null; // Cuenta no encontrada
     }
-
+//busca el cleinte por usuario
     public static Cliente buscarClientePorUsuario(String usuario) {
         for (int i = 0; i < totalClientes; i++) {
             if (clientes[i].getUsuarioCliente().equals(usuario)) {
@@ -939,7 +954,7 @@ public class Gestion {
         }
         return null; // Cliente no encontrado
     }
-
+//solicita un id de cliente que no este repetido
     public static String validoID() {
         String[] opciones = {"Intentar con otro ID", "Cancelar"};
 
@@ -978,7 +993,7 @@ public class Gestion {
             }
         }
     }
-
+//solicita un correo con validaciones basicas
     public static String validoCorreo() {
         String correo = null;
         String opcionCorreo[] = {"Agregar otro correo", "Cancelar"};
@@ -998,7 +1013,7 @@ public class Gestion {
         }
         return correo;
     }
-
+//pide un id de cliente existente o deja "todos"
     private static String solicitarIdCliente() {
         String id = JOptionPane.showInputDialog("Ingrese el ID del cliente (o dejar vacío para Todos):");
         if (id == null || id.trim().equals("")) {
@@ -1012,21 +1027,21 @@ public class Gestion {
         JOptionPane.showMessageDialog(null, "Cliente no encontrado, manteniendo filtro en 'Todos'");
         return "Todos";
     }
-
+//pide el estado activo, inactivo o todos
     private static String solicitarEstado() {
         String estados[] = {"Activo", "Inactivo", "Todos"};
         int opcion = JOptionPane.showOptionDialog(null, "Seleccione estado:", "Filtro Estado",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, estados, estados[0]);
         return estados[opcion];
     }
-
+// pide el tipo de cuenta corriente, ahorros, inversión, planilla o todso
     private static String solicitarTipoCuenta() {
         String tipos[] = {"Corriente", "Ahorros", "Inversion", "Planilla", "Todos"};
         int opcion = JOptionPane.showOptionDialog(null, "Seleccione tipo de cuenta:", "Filtro Tipo de Cuenta",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, tipos, tipos[0]);
         return tipos[opcion];
     }
-
+//pide unvalor de saldo solo digitos
     private static double solicitarSaldo() {
         // Arreglo de dígitos permitidos
         char numeros[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -1070,14 +1085,14 @@ public class Gestion {
 
         return Double.parseDouble(saldoIngresado);
     }
-
+//pide el tipo de comparacion para salso, mayor, menos o todos
     private static String solicitarTipoSaldo() {
         String[] opciones = {"Mayor", "Menor", "Todos"};
         int opcion = JOptionPane.showOptionDialog(null, "Seleccione tipo de comparación de saldo:",
                 "Filtro Saldo", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[0]);
         return opciones[opcion];
     }
-
+//evalua si una cueneta pasa los filtros activos(id,estado, tipo, salfo)
     private static boolean pasaFiltros(Cliente cliente, Cuenta cuenta) {
         // Filtro ID cliente
         if (!filtroIdCliente.equals("Todos") && !cliente.getIdCliente().equals(filtroIdCliente)) {

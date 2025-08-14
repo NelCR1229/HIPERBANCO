@@ -3,40 +3,48 @@ package com.mycompany.proyectov3;
 import javax.swing.JOptionPane;
 
 /*
- *2° Avance Proyecto
+ *3° Avance Proyecto
  * ------Autores----- 
  * Miguel Aguilar Brenes 
  * Alexander Campos Marín 
  * Nelson Cardona Rocha
  */
 public class ProyectoV3 {
+    /**
+     * El main del sistema hiperbanco
+     * menu para cargar datos de
+     * @param args 
+     */
 
     public static void main(String[] args) {
         HiperBanco();
     }
-
+//Muestra el menu inicial del sistema y dirige al usuario 
+    //al menu de banco o gestion inicio cliente
     public static void HiperBanco() {
         int opcionInicio;
+        do {
         String btnMenuInicio[] = {"BANCO", "CLIENTE", "SALIR"};
 
         opcionInicio = JOptionPane.showOptionDialog(null, "Bienvenido al sistema", "Hiper Banco",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, btnMenuInicio, "SALIR");
         switch (opcionInicio) {
             case 0:
-                MenuBanco();
+                MenuBanco();//regresa al menu principal 
                 break;
             case 1:
                 Gestion.InicioCliente();
-                HiperBanco();
                 break;
             case 2:
-                JOptionPane.showMessageDialog(null, "Saliendo del sistema Hiper Banco");
+                JOptionPane.showMessageDialog(null, "Saliendo del sistema Hiper Banco... Gracias por Usar");
                 break;
             default:
                 JOptionPane.showMessageDialog(null, "Opcion invalida");
-        }
-    }
+        }            
+        } while (opcionInicio!=2);
 
+    }
+    //menú del banco con ocpiones del 1 al 9 
     public static void MenuBanco() {
         int menuBanco;
         do {
@@ -79,7 +87,6 @@ public class ProyectoV3 {
                     break;
                 case 9:
                     JOptionPane.showMessageDialog(null, "Saliendo del menú Bancario...");
-                    HiperBanco();
                     break;
                 default:
                     JOptionPane.showMessageDialog(null, "La opción " + menuBanco + " ingresada no valida, intente de nuevo.");

@@ -5,4 +5,5 @@ public enum TipoCuenta {
     Ahorros,
     Inversion,
     Planilla
+    //enunm con los diferentes tipos de cuenta 
 }

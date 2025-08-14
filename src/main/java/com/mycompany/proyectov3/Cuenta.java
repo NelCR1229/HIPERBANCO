@@ -1,10 +1,19 @@
 package com.mycompany.proyectov3;
-
 import java.time.LocalDate;
 
+/**
+ * Cuenta bancaria que perteence a un cliente
+ * en la clase se alamcena información principal de la cuenta, como cleinte 
+ * asociado, tipo de cuenta, fecha de apertura , saldo inicial entre otros datso
+ * referentes a la cuenta 
+ * En esta clase se genera un numero de cuenta secuencual de forma automatica
+ * 
+ * @author migag
+ */
 public class Cuenta {
 
     // 1. Atributos
+    //para generar numero de cuenta consecutivo 
     private static int referenciaNumCuenta = 4710;
     private int numCuentaCliente;
     private Cliente cliente;
@@ -27,14 +36,14 @@ public class Cuenta {
         this.historial = new Movimientos[100]; // capacidad para 100 movimientos
     }
 
-
+//Se agrega un nuevo movimiento al historial de la cuenta 
     public void agregarMovimiento(Movimientos mov) {
         if (totalmovimientos < historial.length) {
             historial[totalmovimientos] = mov;
             totalmovimientos++;
         }
     }
-    
+    //con un confdicional y ciclo retorna el historial de movimientos
     public String mostrarHistorial() {
         if (totalmovimientos == 0) {
             return "No hay movimientos registrados.";
@@ -47,7 +56,7 @@ public class Cuenta {
         return resultado;
     }
     
-    
+    //Se muestra la información principla de la cuenta 
     public String obtenerDatos(boolean conSaltoLinea) {
         String salto = ", ";
         
@@ -63,7 +72,7 @@ public class Cuenta {
                 + "PROPIETARIO: " + cliente.getNombreCliente();
     }
 
-    //Metodos encapsuladores
+    //Metodos encapsuladores getters and setters
     public int getNumCuentaCliente() {
         return numCuentaCliente;
     }
